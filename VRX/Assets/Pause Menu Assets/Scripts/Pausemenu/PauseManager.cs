@@ -306,9 +306,7 @@ namespace GreatArcStudios
             //Debug.Log("ini res" + currentRes);
             resolutionLabel.text = Screen.currentResolution.width.ToString() + " x " + Screen.currentResolution.height.ToString();
             isFullscreen = Screen.fullScreen;
-            //get initial screen effect bools
-            lastAOBool = aoToggle.isOn;
-            lastDOFBool = dofToggle.isOn;
+ 
             //get all specified audio source volumes
             _beforeEffectVol = new float[_audioEffectAmt];
             beforeMaster = AudioListener.volume;
@@ -360,8 +358,13 @@ namespace GreatArcStudios
         /// </summary>
         public void Restart()
         {
+            
             Application.LoadLevel(Application.loadedLevel);
             uiEventSystem.firstSelectedGameObject = defualtSelectedMain;
+            mainPanel.SetActive(false);
+            vidPanel.SetActive(false);
+            audioPanel.SetActive(false);
+            Time.timeScale = 1;
         }
         /// <summary>
         /// Method to resume the game, so disable the pause menu and re-enable all other ui elements
@@ -687,45 +690,9 @@ namespace GreatArcStudios
         {
             uiEventSystem.SetSelectedGameObject(defualtSelectedVideo);
             vidPanelAnimator.Play("Video Panel In");
-
-            if (QualitySettings.antiAliasing == 0)
-            {
-                aaCombo.value = 0;
-            }
-            else if (QualitySettings.antiAliasing == 2)
-            {
-                aaCombo.value = 1;
-            }
-            else if (QualitySettings.antiAliasing == 4)
-            {
-                aaCombo.value = 2;
-            }
-            else if (QualitySettings.antiAliasing == 8)
-            {
-                aaCombo.value = 3;
-            }
-            if (QualitySettings.anisotropicFiltering == AnisotropicFiltering.ForceEnable)
-            {
-                afCombo.value = 1;
-            }
-            else if (QualitySettings.anisotropicFiltering == AnisotropicFiltering.Disable)
-            {
-                afCombo.value = 0;
-            }
-            else if (QualitySettings.anisotropicFiltering == AnisotropicFiltering.Enable)
-            {
-                afCombo.value = 2;
-            }
             presetLabel.text = presets[QualitySettings.GetQualityLevel()].ToString();
             fovSlider.value = mainCam.fieldOfView;
-            modelQualSlider.value = QualitySettings.lodBias;
-            renderDistSlider.value = mainCam.farClipPlane;
-            shadowDistSlider.value = QualitySettings.shadowDistance;
-            masterTexSlider.value = QualitySettings.masterTextureLimit;
-            shadowCascadesSlider.value = QualitySettings.shadowCascades;
             fullscreenToggle.isOn = Screen.fullScreen;
-            aoToggle.isOn = aoBool;
-            dofToggle.isOn = dofBool;
             if (QualitySettings.vSyncCount == 0)
             {
                 vSyncToggle.isOn = false;
@@ -775,22 +742,10 @@ namespace GreatArcStudios
             yield return StartCoroutine(CoroutineUtilities.WaitForRealTime((float)vidPanelAnimator.GetCurrentAnimatorClipInfo(0).Length));
             try
             {
-                mainCam.farClipPlane = renderDistINI;
-                Terrain.activeTerrain.detailObjectDensity = densityINI;
-                mainCam.fieldOfView = fovINI;
                 mainPanel.SetActive(true);
                 vidPanel.SetActive(false);
                 audioPanel.SetActive(false);
-                aoBool = lastAOBool;
-                dofBool = lastDOFBool;
-                Screen.SetResolution(beforeRes.width, beforeRes.height, Screen.fullScreen);
-                QualitySettings.shadowDistance = shadowDistINI;
-                QualitySettings.antiAliasing = (int)aaQualINI;
-                QualitySettings.antiAliasing = msaaINI;
-                QualitySettings.vSyncCount = vsyncINI;
-                QualitySettings.masterTextureLimit = lastTexLimit;
-                QualitySettings.shadowCascades = lastShadowCascade;
-                Screen.fullScreen = isFullscreen;
+              
             }
             catch
             {
@@ -884,58 +839,6 @@ namespace GreatArcStudios
 
         }
         /// <summary>
-        /// Update full high quality tree mesh amount.
-        /// </summary>
-        /// <param name="f"></param>
-        public void updateTreeMeshAmt(int f)
-        {
-
-            if (useSimpleTerrain == true)
-            {
-                simpleTerrain.treeMaximumFullLODCount = (int)f;
-            }
-            else
-            {
-                terrain.treeMaximumFullLODCount = (int)f;
-            }
-
-        }
-        /// <summary>
-        /// Change the lod bias using
-        /// <c>
-        /// QualitySettings.lodBias = LoDBias / 2.15f;
-        /// </c> 
-        /// LoDBias is only divided by 2.15 because the max is set to 10 on the slider, and dividing by 2.15 results in 4.65, our desired max. However, deleting or changing 2.15 is compeletly fine.
-        /// </summary>
-        /// <param name="LoDBias"></param>
-        public void lodBias(float LoDBias)
-        {
-            QualitySettings.lodBias = LoDBias / 2.15f;
-        }
-        /// <summary>
-        /// Update the render distance using 
-        /// <c>
-        /// mainCam.farClipPlane = f;
-        /// </c>
-        /// </summary>
-        /// <param name="f"></param>
-        public void updateRenderDist(float f)
-        {
-            try
-            {
-                mainCam.farClipPlane = f;
-
-            }
-            catch
-            {
-                Debug.Log(" Finding main camera now...it is still suggested that you manually assign this");
-                mainCam = Camera.main;
-                mainCam.farClipPlane = f;
-
-            }
-
-        }
-        /// <summary>
         /// Update the texture quality using  
         /// <c>QualitySettings.masterTextureLimit </c>
         /// </summary>
@@ -947,114 +850,12 @@ namespace GreatArcStudios
             QualitySettings.masterTextureLimit = f;
         }
         /// <summary>
-        /// Update the shadow distance using 
-        /// <c>
-        /// QualitySettings.shadowDistance = dist;
-        /// </c>
-        /// </summary>
-        /// <param name="dist"></param>
-        public void updateShadowDistance(float dist)
-        {
-            QualitySettings.shadowDistance = dist;
-
-        }
-        /// <summary>
-        /// Change the max amount of high quality trees using 
-        /// <c>
-        /// terrain.treeMaximumFullLODCount = (int)qual;
-        /// </c>
-        /// </summary>
-        /// <param name="qual"></param>
-        public void treeMaxLod(float qual)
-        {
-            if (useSimpleTerrain == true)
-            {
-                simpleTerrain.treeMaximumFullLODCount = (int)qual;
-            }
-            else
-            {
-                terrain.treeMaximumFullLODCount = (int)qual;
-            }
-
-        }
-        /// <summary>
-        /// Change the height map max LOD using 
-        /// <c>
-        /// terrain.heightmapMaximumLOD = (int)qual;
-        /// </c>
-        /// </summary>
-        /// <param name="qual"></param>
-        public void updateTerrainLod(float qual)
-        {
-            try { if (useSimpleTerrain == true) { simpleTerrain.heightmapMaximumLOD = (int)qual; } else { terrain.heightmapMaximumLOD = (int)qual; } }
-            catch { Debug.Log("Terrain not assigned"); return; }
-
-        }
-        /// <summary>
         /// Change the fov using a float. The defualt should be 60.
         /// </summary>
         /// <param name="fov"></param>
         public void updateFOV(float fov)
         {
             mainCam.fieldOfView = fov;
-        }
-        /// <summary>
-        /// Toggle on or off Depth of Field. This is meant to be used with a checkbox.
-        /// </summary>
-        /// <param name="b"></param>
-        public void toggleDOF(Boolean b)
-        {
-            try
-            {
-                tempScript = (MonoBehaviour)mainCamObj.GetComponent(DOFScriptName);
-
-                if (b == true)
-                {
-                    tempScript.enabled = true;
-                    dofBool = true;
-                }
-                else
-                {
-                    tempScript.enabled = false;
-                    dofBool = false;
-                }
-            }
-            catch
-            {
-                Debug.Log("No AO post processing found");
-                return;
-            }
-
-
-
-        }
-        /// <summary>
-        /// Toggle on or off Ambient Occulusion. This is meant to be used with a checkbox.
-        /// </summary>
-        /// <param name="b"></param>
-        public void toggleAO(Boolean b)
-        {
-            try
-            {
-
-                tempScript = (MonoBehaviour)mainCamObj.GetComponent(AOScriptName);
-
-                if (b == true)
-                {
-                    tempScript.enabled = true;
-                    aoBool = true;
-                }
-                else
-                {
-                    tempScript.enabled = false;
-                    aoBool = false;
-                }
-            }
-            catch
-            {
-                Debug.Log("No AO post processing found");
-                return;
-            }
         }
         /// <summary>
         /// Set the game to windowed or full screen. This is meant to be used with a checkbox
@@ -1120,150 +921,6 @@ namespace GreatArcStudios
                 }
             }
 
-        }
-        public void enableSimpleTerrain(Boolean b)
-        {
-            useSimpleTerrain = b;
-        }
-        /// <summary>
-        /// Force aniso on using quality settings
-        /// </summary>
-        //Force the aniso on.
-        public void forceOnANISO()
-        {
-            QualitySettings.anisotropicFiltering = AnisotropicFiltering.ForceEnable;
-        }
-        /// <summary>
-        /// Per texture aniso using quality settings
-        /// </summary>
-        //Use per texture aniso settings.
-        public void perTexANISO()
-        {
-            QualitySettings.anisotropicFiltering = AnisotropicFiltering.Enable;
-        }
-        /// <summary>
-        /// Disable aniso using quality setttings
-        /// </summary>
-        //Disable aniso all together.
-        public void disableANISO()
-        {
-            QualitySettings.anisotropicFiltering = AnisotropicFiltering.Disable;
-        }
-        /// <summary>
-        /// The method for changing aniso settings
-        /// </summary>
-        /// <param name="anisoSetting"></param>
-        public void updateANISO(int anisoSetting)
-        {
-            if (anisoSetting == 0)
-            {
-                disableANISO();
-            }
-            else if (anisoSetting == 1)
-            {
-                forceOnANISO();
-            }
-            else if (anisoSetting == 2)
-            {
-                perTexANISO();
-            }
-        }
-
-        /// <summary>
-        /// The method for setting the amount of shadow cascades
-        /// </summary>
-        /// <param name="cascades"></param>
-        public void updateCascades(float cascades)
-        {
-
-            int c = Mathf.RoundToInt(cascades);
-            if (c == 1)
-            {
-                c = 2;
-            }
-            else if (c == 3)
-            {
-                c = 2;
-            }
-            QualitySettings.shadowCascades = c;
-        }
-        /// <summary>
-        /// Update terrain density
-        /// </summary>
-        /// <param name="density"></param>
-        public void updateDensity(float density)
-        {
-            detailDensity = density;
-            try
-            {
-                terrain.detailObjectDensity = detailDensity;
-            }
-            catch
-            {
-                Debug.Log("Please assign a terrain");
-            }
-
-        }
-        /// <summary>
-        /// Update MSAA quality using quality settings
-        /// </summary>
-        /// <param name="msaaAmount"></param>
-        public void updateMSAA(int msaaAmount)
-        {
-            if (msaaAmount == 0)
-            {
-                disableMSAA();
-            }
-            else if (msaaAmount == 1)
-            {
-                twoMSAA();
-            }
-            else if (msaaAmount == 2)
-            {
-                fourMSAA();
-            }
-            else if (msaaAmount == 3)
-            {
-                eightMSAA();
-            }
-
-        }
-        /// <summary>
-        /// Set MSAA to 0x (disabling it) using quality settings
-        /// </summary>
-        public void disableMSAA()
-        {
-
-            QualitySettings.antiAliasing = 0;
-            // aaOption.text = "MSAA: " + QualitySettings.antiAliasing.ToString();
-        }
-        /// <summary>
-        /// Set MSAA to 2x using quality settings
-        /// </summary>
-        public void twoMSAA()
-        {
-
-            QualitySettings.antiAliasing = 2;
-            // aaOption.text = "MSAA: " + QualitySettings.antiAliasing.ToString();
-        }
-        /// <summary>
-        /// Set MSAA to 4x using quality settings
-        /// </summary>
-        public void fourMSAA()
-        {
-
-            QualitySettings.antiAliasing = 4;
-
-            // aaOption.text = "MSAA: " + QualitySettings.antiAliasing.ToString();
-        }
-        /// <summary>
-        /// Set MSAA to 8x using quality settings
-        /// </summary>
-        public void eightMSAA()
-        {
-
-            QualitySettings.antiAliasing = 8;
-            // aaOption.text = "MSAA: " + QualitySettings.antiAliasing.ToString();
         }
         /// <summary>
         /// Set the quality level one level higher. This is done by getting the current quality level, then using 
