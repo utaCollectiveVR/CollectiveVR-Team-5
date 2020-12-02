@@ -27,6 +27,29 @@
             </e>
           </e>
         </e>
+<<<<<<< Updated upstream
+=======
+        <e p="Pause Menu Assets" t="Include">
+          <e p="Fonts" t="Include">
+            <e p="exo" t="Include">
+              <e p="SIL Open Font License.txt" t="Include" />
+            </e>
+            <e p="open-sans" t="Include">
+              <e p="Apache License.txt" t="Include" />
+            </e>
+          </e>
+          <e p="Scripts" t="Include">
+            <e p="Pausemenu" t="Include">
+              <e p="PauseManager.cs" t="Include" />
+              <e p="SaveSettings.cs" t="Include" />
+            </e>
+            <e p="Utlities" t="Include">
+              <e p="CoroutineUtlities.cs" t="Include" />
+              <e p="Rotate.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+>>>>>>> Stashed changes
         <e p="PreFabs" t="Include">
           <e p="Ornamental Flower Set" t="Include">
             <e p="Shaders" t="Include">
@@ -53,8 +76,11 @@
           <e p="Patient.cs" t="Include" />
           <e p="PatientBed.cs" t="Include" />
           <e p="PatientBedMattress.cs" t="Include" />
+<<<<<<< Updated upstream
           <e p="PatientHead.cs" t="Include" />
           <e p="PatientLowerBody.cs" t="Include" />
+=======
+>>>>>>> Stashed changes
           <e p="PlayerInventory.cs" t="Include" />
           <e p="PlayerMovement.cs" t="Include" />
           <e p="Score.cs" t="Include" />
