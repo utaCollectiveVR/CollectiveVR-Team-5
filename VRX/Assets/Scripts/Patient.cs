@@ -178,6 +178,11 @@ public class Patient : MonoBehaviour, IInteractable, IPerson
             button.SetActive(true);
         }
 
+        // dont let player move while interacting w/ patient
+        GameObject thePlayer = GameObject.Find("Player");
+        PlayerMovement pm = thePlayer.GetComponent<PlayerMovement>();
+        pm.canMove = false;
+
         // Select first button. 
         InteractMenuOptionButtons[0].GetComponent<Button>().Select();
 
@@ -336,6 +341,11 @@ public class Patient : MonoBehaviour, IInteractable, IPerson
         {
             button.SetActive(false);
         }
+
+        // allow patient to move again
+        GameObject thePlayer = GameObject.Find("Player");
+        PlayerMovement pm = thePlayer.GetComponent<PlayerMovement>();
+        pm.canMove = true;
 
         InteractMenu.SetActive(false);
     }
