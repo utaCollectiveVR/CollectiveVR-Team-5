@@ -141,6 +141,11 @@ public class FamilyMember : MonoBehaviour, IInteractable, IPerson
             button.SetActive(true);
         }
 
+        // stop the player from moving around when talking
+        GameObject thePlayer = GameObject.Find("Player");
+        PlayerMovement pm = thePlayer.GetComponent<PlayerMovement>();
+        pm.canMove = false;
+
         // Select first button. 
         InteractMenuOptionButtons[0].GetComponent<Button>().Select();
 
@@ -148,6 +153,8 @@ public class FamilyMember : MonoBehaviour, IInteractable, IPerson
         {
             ObjectName = ObjectName,
         };
+
+
     }
 
     #endregion
@@ -276,6 +283,11 @@ public class FamilyMember : MonoBehaviour, IInteractable, IPerson
         }
 
         InteractMenu.SetActive(false);
+
+        // allow player to move again
+        GameObject thePlayer = GameObject.Find("Player");
+        PlayerMovement pm = thePlayer.GetComponent<PlayerMovement>();
+        pm.canMove = true;
     }
 
     public void OnOkayClick()
